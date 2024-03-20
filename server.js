@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 require("./config/dbconnect");
+const globalErrHandler = require("./middlewares/globalHandler");
 // dotenv.config();
 const userRoutes = require("./routes/users/users");
 const postRoutes = require("./routes/posts/post");
@@ -31,6 +32,9 @@ app.use("/api/v1/posts", postRoutes);
 app.use("/api/v1/comments", commentRoutes);
 
 // *error handler middlewares
+
+app.use(globalErrHandler);
+
 // *listen server
 
 const port = process.env.port || 9000;

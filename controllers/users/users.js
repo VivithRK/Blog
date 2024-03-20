@@ -1,14 +1,20 @@
 const User = require("../../models/users/User");
 const bcrypt = require("bcrypt");
+const appErr = require("../../utils/appErr");
 
-const registerCtrl = async (req, res) => {
+const registerCtrl = async (req, res, next) => {
   const { fullname, email, password } = req.body;
+  // check if field is empty
+  if (!fullname || !email || !password) {
+    return next(appErr("All fields are required.."));
+  }
   try {
     // *check if the user exists(email)
     const userFound = await User.findOne({ email });
     // *throw if exists
     if (userFound) {
-      return res.json({ status: "Failed", data: "User Already exists" });
+      return next(appErr("User Already exists"));
+      // return res.json({ status: "Failed", data:  });
     }
     // *hash password
     const salt = await bcrypt.genSalt(10);
