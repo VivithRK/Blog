@@ -34,25 +34,26 @@ const registerCtrl = async (req, res, next) => {
   }
 };
 
-const loginCtrl = async (req, res) => {
+const loginCtrl = async (req, res, next) => {
+  // console.log((req.session.loginUser = "EMma"));
   const { email, password } = req.body;
+  if (!email || !password) {
+    return next(appErr("Email and password are required."));
+  }
   try {
     //* Check if the user exist
     const userFound = await User.findOne({ email });
 
     if (!userFound) {
-      return res.json({
-        status: "Failed",
-        user: "User not registered",
-      });
+      return next(appErr("User not registered"));
     }
     const isPasswordValid = await bcrypt.compare(password, userFound.password);
     if (!isPasswordValid) {
-      return res.json({
-        status: "Failed",
-        user: "Bad Password",
-      });
+      return next(appErr("Bad Password"));
     }
+    // *Save the user into
+    req.session.userAuth = userFound._id;
+    console.log(req.session);
     res.json({
       status: "Success",
       user: userFound,
@@ -61,6 +62,7 @@ const loginCtrl = async (req, res) => {
     res.json(err);
   }
 };
+
 const singleUserCtrl = async (req, res) => {
   try {
     res.json({
@@ -74,9 +76,15 @@ const singleUserCtrl = async (req, res) => {
 
 const singleUserProfCtrl = async (req, res) => {
   try {
+    console.log("am working");
+    // *get the login user
+    const userID = req.session.userAuth;
+    // *find the user
+    const user = await User.findById(userID);
+
     res.json({
       status: "Success",
-      user: "Single User profile details",
+      user: user,
     });
   } catch (err) {
     res.json(err);
