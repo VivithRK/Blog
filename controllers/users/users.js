@@ -1,4 +1,5 @@
 const User = require("../../models/users/User");
+const bcrypt = require("bcrypt");
 
 const registerCtrl = async (req, res) => {
   const { fullname, email, password } = req.body;
@@ -10,9 +11,14 @@ const registerCtrl = async (req, res) => {
       return res.json({ status: "Failed", data: "User Already exists" });
     }
     // *hash password
-
+    const salt = await bcrypt.genSalt(10);
+    const passwordHashed = await bcrypt.hash(password, salt);
     // *register user
-    const user = await User.create({ fullname, email, password });
+    const user = await User.create({
+      fullname,
+      email,
+      password: passwordHashed,
+    });
     res.json({
       status: "Success",
       user: user,
@@ -23,10 +29,27 @@ const registerCtrl = async (req, res) => {
 };
 
 const loginCtrl = async (req, res) => {
+  const { email, password } = req.body;
   try {
+    //* Check if the user exist
+    const userFound = await User.findOne({ email });
+
+    if (!userFound) {
+      return res.json({
+        status: "Failed",
+        user: "User not registered",
+      });
+    }
+    const isPasswordValid = await bcrypt.compare(password, userFound.password);
+    if (!isPasswordValid) {
+      return res.json({
+        status: "Failed",
+        user: "Bad Password",
+      });
+    }
     res.json({
       status: "Success",
-      user: "User registered",
+      user: userFound,
     });
   } catch (err) {
     res.json(err);
