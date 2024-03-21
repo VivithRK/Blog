@@ -65,9 +65,13 @@ const loginCtrl = async (req, res, next) => {
 
 const singleUserCtrl = async (req, res) => {
   try {
+    // * get userId from params
+    const userId = req.params.id;
+    //* find the user
+    const user = await User.findById(userId);
     res.json({
       status: "Success",
-      user: "Single User Details",
+      user,
     });
   } catch (err) {
     res.json(err);
@@ -90,16 +94,79 @@ const singleUserProfCtrl = async (req, res) => {
     res.json(err);
   }
 };
-const picUploadCtrl = async (req, res) => {
+
+const picUploadCtrl = async (req, res, next) => {
+  console.log(req.file);
   try {
+    const userID = req.session.userAuth;
+    const userFound = await User.findById(userID);
+
+    if (!userFound) {
+      return res.json(next(appErr("Please login boss")));
+    }
+    const user = await User.findByIdAndUpdate(
+      userID,
+      {
+        profileImage: req.file.path,
+      },
+      { new: true }
+    );
     res.json({
       status: "Success",
-      user: "profile photo uploaded",
+      user: user,
     });
   } catch (err) {
-    res.json(err);
+    res.json(next(appErr(err.message)));
   }
 };
+
+const updateUserCtrl = async (req, res, next) => {
+  const { fullname, email, password } = req.body;
+  try {
+    // * check if email is not taken
+    if (email) {
+      const emailTaken = await User.findOne({ email });
+      if (emailTaken) {
+        return next(appErr("Email is taken", 400));
+      }
+    }
+
+    // *Update the User
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { fullname, email },
+      { new: true }
+    );
+
+    res.json({
+      status: "Success",
+      data: user,
+    });
+  } catch (err) {
+    res.json(next(appErr(err)));
+  }
+};
+
+const updatePswdCtrl = async (req, res, next) => {
+  const { password } = req.body;
+  try {
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      const passwordHashed = await bcrypt.hash(password, salt);
+      await User.findByIdAndUpdate(req.params.id, {
+        password: passwordHashed,
+      });
+    }
+
+    res.json({
+      status: "Success",
+      user: "User password updated",
+    });
+  } catch (err) {
+    res.json(next(appErr("Provide password field")));
+  }
+};
+
 const cvUploadCtrl = async (req, res) => {
   try {
     res.json({
@@ -128,4 +195,6 @@ module.exports = {
   picUploadCtrl,
   cvUploadCtrl,
   logoutCtrl,
+  updateUserCtrl,
+  updatePswdCtrl,
 };
