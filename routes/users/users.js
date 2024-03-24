@@ -16,10 +16,10 @@ const storage = require("../../config/cloudinary");
 
 //* instance of a multer
 const upload = multer({ storage });
-console.log(upload);
+// console.log(upload);
 const userRoutes = express.Router();
 
-console.log(process.env.CLOUDINARY_SECRET_KEY);
+// console.log(process.env.CLOUDINARY_SECRET_KEY);
 // *Register
 
 userRoutes.post("/register", registerCtrl);
