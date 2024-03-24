@@ -39,7 +39,12 @@ userRoutes.put(
 );
 
 // GET/:id
-userRoutes.put("/cover-photo-upload/:id", cvUploadCtrl);
+userRoutes.put(
+  "/cover-photo-upload",
+  protected,
+  upload.single("cover"),
+  cvUploadCtrl
+);
 
 userRoutes.put("/update/:id", updateUserCtrl);
 userRoutes.put("/update-password/:id", updatePswdCtrl);

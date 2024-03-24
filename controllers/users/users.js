@@ -168,13 +168,27 @@ const updatePswdCtrl = async (req, res, next) => {
 };
 
 const cvUploadCtrl = async (req, res) => {
+  console.log(req.file);
   try {
+    const userID = req.session.userAuth;
+    const userFound = await User.findById(userID);
+
+    if (!userFound) {
+      return res.json(next(appErr("Please login boss")));
+    }
+    const user = await User.findByIdAndUpdate(
+      userID,
+      {
+        coverImage: req.file.path,
+      },
+      { new: true }
+    );
     res.json({
       status: "Success",
-      user: "cover photo uploaded",
+      user: user,
     });
   } catch (err) {
-    res.json(err);
+    res.json(next(appErr(err.message)));
   }
 };
 const logoutCtrl = async (req, res) => {

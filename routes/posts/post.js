@@ -8,7 +8,9 @@ const {
 } = require("../../controllers/posts/posts");
 const postRoutes = express.Router();
 
-postRoutes.post("/", createCtrl);
+const protected = require("../../middlewares/protected");
+
+postRoutes.post("/", protected, createCtrl);
 
 // get/api/v1/posts/
 postRoutes.get("/", postsCtrl);
