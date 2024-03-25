@@ -38,7 +38,7 @@ const singlePostCtrl = async (req, res) => {
   try {
     const id = req.params.id;
     // *Find the posts
-    const post = await Post.findById(id);
+    const post = await Post.findById(id).populate("comment");
 
     res.json({
       status: "Success",
@@ -51,7 +51,7 @@ const singlePostCtrl = async (req, res) => {
 
 const postsCtrl = async (req, res) => {
   try {
-    const posts = await Post.find();
+    const posts = await Post.find().populate("comment");
 
     res.json({
       status: "Success",

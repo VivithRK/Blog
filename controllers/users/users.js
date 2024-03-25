@@ -84,11 +84,15 @@ const singleUserProfCtrl = async (req, res) => {
     // *get the login user
     const userID = req.session.userAuth;
     // *find the user
-    const user = await User.findById(userID).populate("posts");
+    // console.log(userID);
+    const user = await User.findById(userID)
+      .populate("comment")
+      .populate("posts");
+    // console.log(user);
 
     res.json({
       status: "Success",
-      user: user,
+      user,
     });
   } catch (err) {
     res.json(err);

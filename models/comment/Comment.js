@@ -21,6 +21,6 @@ const commentSchema = new mongoose.Schema(
 // * timestamps are used to automatically updated when the document was created
 
 // *compile the schema to form a model
-const Comment = mongoose.model("comment", commentSchema);
+const Comment = mongoose.model("Comment", commentSchema);
 
 module.exports = Comment;
