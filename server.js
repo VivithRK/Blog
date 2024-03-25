@@ -8,7 +8,7 @@ const MongoStore = require("connect-mongo");
 const userRoutes = require("./routes/users/users");
 const postRoutes = require("./routes/posts/post");
 const commentRoutes = require("./routes/comments/comment");
-
+const ejs = require("ejs");
 const app = express();
 
 // *session config
@@ -25,12 +25,35 @@ app.use(
 );
 
 // *middlewares
+app.set("view engine", "ejs");
+// *static files
+app.use(express.static(__dirname + "/public"));
 app.use(express.json());
 // *routes
-// ?--------
+
+// *render home
+app.get("/", (req, res) => {
+  res.render("index");
+});
+
+app.get("/login", (req, res) => {
+  res.render("users/login");
+});
+app.get("/profile", (req, res) => {
+  res.render("users/profile");
+});
+app.get("/register", (req, res) => {
+  res.render("users/register");
+});
+app.get("/upload-profile-photo", (req, res) => {
+  res.render("users/uploadProfilePhoto");
+});
+app.get("/upload-cover-photo", (req, res) => {
+  res.render("users/uploadCoverPhoto");
+});
+
 // ?user route
 // ?--------
-
 app.use("/api/v1/users", userRoutes);
 // !this is a middleware
 
